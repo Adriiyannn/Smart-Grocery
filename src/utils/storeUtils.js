@@ -4,7 +4,7 @@ import supabase from './supabase';
 export const STORE_OPTIONS = [
   { id: 'robinsons', name: 'Robinsons Supermarket', icon: '🏬' },
   { id: 'puregold', name: 'Puregold', icon: '🛒' },
-  { id: 'gaisano', name: 'Gaisano Capital', icon: '🏪' },
+  { id: 'gaisano', name: 'Gaisano Mall', icon: '🏪' },
   { id: 'iligan_market', name: 'Iligan City Public Market', icon: '🛍️' },
   { id: '7eleven', name: '7-Eleven', icon: '🏪' },
   { id: 'ministop', name: 'Mini Stop', icon: '🛒' },
