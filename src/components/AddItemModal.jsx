@@ -6,6 +6,108 @@ const modalStyles = `
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
   }
+  
+  /* Force black text on all input types */
+  .modal-input {
+    color: #000000 !important;
+    caret-color: #000000 !important;
+    background-color: white !important;
+  }
+  
+  .modal-input::-webkit-selection {
+    background-color: rgba(59, 130, 246, 0.3) !important;
+    color: #000000 !important;
+  }
+  
+  .modal-input::selection {
+    background-color: rgba(59, 130, 246, 0.3) !important;
+    color: #000000 !important;
+  }
+  
+  .modal-input::-moz-selection {
+    background-color: rgba(59, 130, 246, 0.3) !important;
+    color: #000000 !important;
+  }
+  
+  .modal-input::-webkit-outer-spin-button,
+  .modal-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  
+  .modal-input[type="number"] {
+    -moz-appearance: textfield;
+  }
+  
+  /* Autofill styling */
+  .modal-input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 1000px white inset !important;
+    -webkit-text-fill-color: #000000 !important;
+  }
+  
+  .modal-input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 1000px white inset !important;
+    -webkit-text-fill-color: #000000 !important;
+  }
+  
+  .modal-input:focus {
+    color: #000000 !important;
+    background-color: white !important;
+  }
+  
+  .modal-input::placeholder {
+    color: #9CA3AF !important;
+    opacity: 1 !important;
+  }
+  
+  /* Force black text on selects */
+  .modal-select {
+    color: #000000 !important;
+    caret-color: #000000 !important;
+    background-color: white !important;
+  }
+  
+  .modal-select:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 1000px white inset !important;
+    -webkit-text-fill-color: #000000 !important;
+  }
+  
+  .modal-select option {
+    color: #000000 !important;
+    background-color: white !important;
+  }
+  
+  .modal-select option:checked {
+    color: #000000 !important;
+    background: linear-gradient(#3B82F6, #3B82F6) !important;
+  }
+  
+  /* Force black text on textareas */
+  .modal-textarea {
+    color: #000000 !important;
+    caret-color: #000000 !important;
+    background-color: white !important;
+  }
+  
+  .modal-textarea::-webkit-selection {
+    background-color: rgba(59, 130, 246, 0.3) !important;
+    color: #000000 !important;
+  }
+  
+  .modal-textarea::selection {
+    background-color: rgba(59, 130, 246, 0.3) !important;
+    color: #000000 !important;
+  }
+  
+  .modal-textarea::placeholder {
+    color: #9CA3AF !important;
+    opacity: 1 !important;
+  }
+  
+  .modal-textarea:focus {
+    color: #000000 !important;
+    background-color: white !important;
+  }
 `;
 
 export default function AddItemModal({ isOpen, onClose, onSubmit, editingItem, loading, categories }) {
@@ -41,6 +143,50 @@ export default function AddItemModal({ isOpen, onClose, onSubmit, editingItem, l
       });
     }
   }, [isOpen, editingItem]);
+
+  // Force text color to black on all inputs
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const inputs = document.querySelectorAll('.modal-input, .modal-select, .modal-textarea');
+    
+    const forceBlackText = () => {
+      inputs.forEach((input) => {
+        input.style.color = '#000000';
+        input.style.backgroundColor = '#ffffff';
+        input.style.caretColor = '#000000';
+        
+        // Force selection styling
+        const style = input.getAttribute('style') || '';
+        if (!style.includes('--text-color')) {
+          input.setAttribute('style', `${style}; --text-color: #000000;`);
+        }
+      });
+    };
+
+    forceBlackText();
+    
+    // Run periodically to ensure persistence
+    const interval = setInterval(forceBlackText, 100);
+    
+    // Also watch for input changes
+    inputs.forEach((input) => {
+      input.addEventListener('input', forceBlackText);
+      input.addEventListener('change', forceBlackText);
+      input.addEventListener('focus', forceBlackText);
+      input.addEventListener('blur', forceBlackText);
+    });
+
+    return () => {
+      clearInterval(interval);
+      inputs.forEach((input) => {
+        input.removeEventListener('input', forceBlackText);
+        input.removeEventListener('change', forceBlackText);
+        input.removeEventListener('focus', forceBlackText);
+        input.removeEventListener('blur', forceBlackText);
+      });
+    };
+  }, [isOpen]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -99,7 +245,12 @@ export default function AddItemModal({ isOpen, onClose, onSubmit, editingItem, l
               value={formData.productName}
               onChange={handleChange}
               placeholder="e.g., Milk, Bread, Apples"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              style={{
+                color: '#000000',
+                backgroundColor: '#ffffff',
+                caretColor: '#000000',
+              }}
+              className="modal-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
@@ -112,7 +263,11 @@ export default function AddItemModal({ isOpen, onClose, onSubmit, editingItem, l
               name="category"
               value={formData.category}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              style={{
+                color: '#000000',
+                backgroundColor: '#ffffff',
+              }}
+              className="modal-select w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               {categories.map((cat) => (
                 <option key={cat} value={cat}>
@@ -133,7 +288,12 @@ export default function AddItemModal({ isOpen, onClose, onSubmit, editingItem, l
               value={formData.quantity}
               onChange={handleChange}
               min="1"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              style={{
+                color: '#000000',
+                backgroundColor: '#ffffff',
+                caretColor: '#000000',
+              }}
+              className="modal-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
@@ -146,7 +306,11 @@ export default function AddItemModal({ isOpen, onClose, onSubmit, editingItem, l
               name="unitType"
               value={formData.unitType}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              style={{
+                color: '#000000',
+                backgroundColor: '#ffffff',
+              }}
+              className="modal-select w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               {unitTypes.map((unit) => (
                 <option key={unit} value={unit}>
@@ -171,7 +335,12 @@ export default function AddItemModal({ isOpen, onClose, onSubmit, editingItem, l
                 step="0.01"
                 min="0"
                 placeholder="0.00"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                style={{
+                  color: '#000000',
+                  backgroundColor: '#ffffff',
+                  caretColor: '#000000',
+                }}
+                className="modal-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
           </div>
@@ -187,7 +356,12 @@ export default function AddItemModal({ isOpen, onClose, onSubmit, editingItem, l
               onChange={handleChange}
               placeholder="e.g., Brand preference, specific store location"
               rows="2"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              style={{
+                color: '#000000',
+                backgroundColor: '#ffffff',
+                caretColor: '#000000',
+              }}
+              className="modal-textarea w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
